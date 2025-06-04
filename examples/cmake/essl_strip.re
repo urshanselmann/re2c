@@ -3,6 +3,7 @@
 
 /*!conditions:re2c*/
 #include "essl_strip.h"
+/*!max:re2c format = "const size_t YYMAXFILL = @@;"; */
 
 void essl_strip(const char *s, std::string &out) {
     const char *YYCURSOR = s, *YYMARKER;
@@ -30,14 +31,14 @@ void essl_strip(const char *s, std::string &out) {
         <INITIAL> V310    { out.append("#version 430 core\n"); goto yyc_CODE; }
         <INITIAL> V320    { out.append("#version 450 core\n"); goto yyc_CODE; }
         <INITIAL> V100    { out.append("#version 100\n"); goto yyc_CODE100; }
-        <INITIAL> Any     { out.push_back(*YYCURSOR); }
+        <INITIAL> Any     { out.push_back(YYCURSOR[-1]); goto yyc_INITIAL; }
 
         <CODE> "\x00" { return; }
-        <CODE> "precision" Ws Qual Ws Ident OptWs ";"   { /* drop */ }
-        <CODE> Qual Ws                                { /* skip token */ }
-        <CODE> Any                                    { out.push_back(*YYCURSOR); }
+        <CODE> "\n" "precision" Ws Qual Ws Ident OptWs ";" OptWs   { /* drop */ goto yyc_CODE; }
+        <CODE> Qual Ws                                { /* skip token */ goto yyc_CODE; }
+        <CODE> Any                                    { out.push_back(YYCURSOR[-1]); goto yyc_CODE; }
 
         <CODE100> "\x00" { return; }
-        <CODE100> Any     { out.push_back(*YYCURSOR); }
+        <CODE100> Any     { out.push_back(YYCURSOR[-1]); goto yyc_CODE100; }
     */
 }
